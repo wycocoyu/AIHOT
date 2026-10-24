@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { NAV, subjectAfter, withSubject } from "@aihot/site";
 import { webModules } from "../../site-modules";
 import {
-  IconBolt, IconBookmark, IconDoc, IconFlame, IconGrid, IconHeart, IconHistory, IconList, IconMessage, IconPlug, IconUser,
+  IconBolt, IconBookmark, IconDoc, IconFlame, IconGrid, IconHeart, IconHistory, IconList, IconMessage, IconPlug, IconSparkles, IconUser,
 } from "../icons";
 
 export interface NavItem {
@@ -23,6 +23,7 @@ const SECTIONS: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { to: "/", label: "精选", icon: IconBolt, end: true },
       { to: "/all", label: subjectAfter("全部", "动态"), icon: IconList },
+      { to: "/all?category=industry", label: "周边与快讯", icon: IconSparkles },
       { to: "/hot", label: "热点榜", icon: IconFlame },
       { to: "/daily", label: withSubject("日报"), icon: IconDoc },
       { to: "/topics", label: "主题", icon: IconGrid },
@@ -76,9 +77,15 @@ export function sidebar(): Array<{ title: string; items: NavItem[] }> {
 }
 
 /** A sidebar entry is lit on its pages; 日报 also covers weekly and monthly reports. */
-export function sidebarIsActive(item: NavItem, pathname: string): boolean {
+export function sidebarIsActive(item: NavItem, pathname: string, search = ""): boolean {
   if (item.end) return pathname === item.to;
   if (item.to === "/daily") return /^\/(daily|weekly|monthly)(\/|$)/.test(pathname);
+  if (item.to === "/all?category=industry") {
+    return pathname === "/all" && new URLSearchParams(search).get("category") === "industry";
+  }
+  if (item.to === "/all") {
+    return pathname === "/all" && new URLSearchParams(search).get("category") !== "industry";
+  }
   return pathname === item.to || pathname.startsWith(`${item.to}/`);
 }
 

@@ -23,8 +23,12 @@ interface GroupRow {
   anchor_at: Date;
 }
 
+const PERIPHERAL_TITLE_PATTERN = "Gemini Model Garden|八折|Lite ?套餐|续费权益|限时加量|提效营|上新[、，]?更新公告|QCon|ChatGPT Ads|Orchestra Bio|公共利益基金|MediaKit";
+
 function filterSql(q: TimelineQuery) {
-  return sql`${channelCondition(q.channel)} ${categoryCondition(q.category)} ${tagCondition(q.tag)}`;
+  const base = sql`${channelCondition(q.channel)} ${categoryCondition(q.category)} ${tagCondition(q.tag)}`;
+  if (q.category === "industry") return base;
+  return sql`${base} AND (p.score IS NULL OR p.score >= 65) AND p.title !~* ${PERIPHERAL_TITLE_PATTERN}`;
 }
 
 function binding(q: TimelineQuery): string {
@@ -55,12 +59,13 @@ async function queryGroupedAnchors(q: TimelineQuery, now: Date) {
   const rows = (
     await sql<{ gk: string; anchor_at: Date }[]>`
       WITH base AS MATERIALIZED (
-        SELECT p.sort_at, CASE WHEN p.fact_id IS NOT NULL AND ${ownFactEvidenceCondition()} AND ${foldableSelectionCondition()}
+        SELECT p.sort_at, COALESCE(p.score, 0) AS score, CASE WHEN p.fact_id IS NOT NULL AND ${ownFactEvidenceCondition()} AND ${foldableSelectionCondition()}
           THEN 'f' || p.fact_id::text ELSE 'a' || p.article_id END AS gk
         FROM publications p
         WHERE ${selectedCondition(now)} ${filterSql(q)}
       )
-      SELECT gk, min(sort_at) AS anchor_at FROM base GROUP BY gk ORDER BY anchor_at DESC, gk COLLATE "C" DESC`
+      SELECT gk, min(sort_at) AS anchor_at FROM base GROUP BY gk
+      ORDER BY (min(sort_at) AT TIME ZONE 'Asia/Shanghai')::date DESC, max(score) DESC, min(sort_at) DESC, gk COLLATE "C" DESC`
   ).map((r) => ({ gk: r.gk, anchor: r.anchor_at.getTime() }));
   return rows;
 }
@@ -87,7 +92,7 @@ export function countTimelineDays(grouped: readonly { anchor: number }[], days: 
 
 export async function loadTimeline(q: TimelineQuery): Promise<Omit<TimelineResponse, "hot">> {
   const now = q.now ?? new Date();
-  const limit = Math.min(Math.max(q.limit ?? 20, 1), 40);
+  const limit = Math.min(Math.max(q.limit ?? 60, 1), 100);
   const bind = binding(q);
   let after: { a: number; g: string } | null = null;
   if (q.cursor) {

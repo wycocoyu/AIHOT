@@ -43,6 +43,31 @@ export const PRESETS: Record<string, ModelPreset> = {
     service: "dashscope", model: "qwen3-vl-flash", baseUrlEnv: "DASHSCOPE_BASE_URL", apiKeyEnv: "DASHSCOPE_API_KEY",
     extra: { enable_thinking: false }, jsonMode: false, vision: true,
   },
+  "doubao-seed-2.1-lite": {
+    service: "doubao", model: "doubao-seed-2.1-lite", baseUrlEnv: "DOUBAO_BASE_URL", apiKeyEnv: "DOUBAO_API_KEY",
+    extra: { thinking: { type: "disabled" } }, jsonMode: true, vision: true,
+    fallbackFor: {
+      prefilter: "default",
+      score: "default",
+      understand: "default",
+      summarize: "default",
+      wording: "default",
+      structure: "default",
+      group: "default",
+      groupReview: "default",
+      digest: "default",
+      report: "default",
+      translate: "default",
+    },
+  },
+  "doubao-seed-2.0-mini": {
+    service: "doubao", model: "doubao-seed-2.0-mini", baseUrlEnv: "DOUBAO_BASE_URL", apiKeyEnv: "DOUBAO_API_KEY",
+    extra: { thinking: { type: "disabled" } }, jsonMode: true, vision: true,
+  },
+  "doubao-seed-2.1-turbo": {
+    service: "doubao", model: "doubao-seed-2.1-turbo", baseUrlEnv: "DOUBAO_BASE_URL", apiKeyEnv: "DOUBAO_API_KEY",
+    extra: { thinking: { type: "disabled" } }, jsonMode: true, vision: true,
+  },
 };
 
 /**

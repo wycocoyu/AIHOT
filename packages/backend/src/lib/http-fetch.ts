@@ -111,6 +111,7 @@ export function requireOk(res: GuardedResponse, what?: string): GuardedResponse 
 
 /** How the collectors introduce themselves: the site's own crawler name and address (site/site.ts). */
 export const DEFAULT_UA = `Mozilla/5.0 (compatible; ${SITE.crawlerName}; +${config.siteUrl}/about)`;
+const WECHAT_BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) MacWechat/3.8.7(0x13080710) XWEB/1191 Flue";
 
 /** The language a source asked for (its config.acceptLanguage), replacing the default preference above. */
 export const languageHeaders = (language: string | undefined): Record<string, string> => language ? { "accept-language": language } : {};
@@ -130,7 +131,13 @@ export async function guardedFetch(input: string, opts: GuardedFetchOptions = {}
   const headers = new Headers({ "user-agent": DEFAULT_UA, "accept-language": "zh-CN,zh;q=0.9,en;q=0.8" });
   // Header names are case-insensitive: a caller's "User-Agent" replaces the default instead of joining it.
   for (const [name, value] of Object.entries(opts.headers ?? {})) headers.set(name, value);
-  const publicHeaders = new Set(["accept", "accept-language", "accept-encoding", "user-agent", "cache-control", "if-modified-since", "if-none-match", "range", "if-range"]);
+  if (/(^|\.)(mp\.weixin\.qq\.com|weread\.qq\.com|qpic\.cn|qlogo\.cn)$/i.test(url.hostname)) {
+    if (headers.get("user-agent") === DEFAULT_UA) headers.set("user-agent", WECHAT_BROWSER_UA);
+    if (/(^|\.)(qpic\.cn|qlogo\.cn)$/i.test(url.hostname) && !headers.has("referer")) {
+      headers.set("referer", "https://mp.weixin.qq.com/");
+    }
+  }
+  const publicHeaders = new Set(["accept", "accept-language", "accept-encoding", "user-agent", "referer", "cache-control", "if-modified-since", "if-none-match", "range", "if-range"]);
   // Unknown custom headers and request bodies may carry credentials: the whole redirect chain keeps the first origin.
   const originBound = opts.redirectPolicy === "same-origin" || opts.body !== undefined || Object.keys(opts.headers ?? {}).some((name) => !publicHeaders.has(name.toLowerCase()));
   const initialOrigin = url.origin;

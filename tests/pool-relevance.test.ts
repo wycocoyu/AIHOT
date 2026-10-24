@@ -17,7 +17,7 @@ before(async () => {
 });
 
 async function add(suffix: string, direct: string, body: string, options: {
-  title?: string; age?: number; channel?: "news" | "x"; category?: "ai-models" | "paper"; tags?: string[];
+  title?: string; age?: number; channel?: "news" | "x"; category?: "ai-models" | "paper" | "ai-products" | "industry"; tags?: string[];
   visibility?: string; eligible?: boolean; future?: boolean; noSearchRow?: boolean;
 } = {}) {
   const at = new Date(+now - (options.age ?? 60) * 1000);
@@ -103,4 +103,22 @@ test("equal relevance ranks a seated selected item, then the higher score, then 
   const result = await loadPool(query("wq"));
   assert.deepEqual(result.items.map(item => item.id), ["tie-selected", "tie-score", "tie-unseated", "tie-new"].map(id));
   assert.equal(result.total, 4);
+});
+
+test("browsing pool separates pure technical items (>= 50) from peripheral items (industry or 20..49) and excludes broken (< 20) items", async () => {
+  const scopeTag = `${T}-layer`;
+  await add("layer-tech-high", "layer", "", { title: "高分架构实践", category: "paper", tags: [scopeTag], age: 10 });
+  await add("layer-promo-lite", "layer", "", { title: "Qoder 国际版推出 Lite 套餐", category: "ai-products", tags: [scopeTag], age: 20 });
+  await add("layer-industry-mid", "layer", "", { title: "某大会议程发布", category: "ai-models", tags: [scopeTag], age: 30 });
+  await add("layer-broken-low", "layer", "", { title: "违规删除投诉页", category: "paper", tags: [scopeTag], age: 40 });
+  await sql`UPDATE publications SET score = 75 WHERE article_id = ${id("layer-tech-high")}`;
+  await sql`UPDATE publications SET score = 30 WHERE article_id = ${id("layer-promo-lite")}`;
+  await sql`UPDATE publications SET score = 55, category = 'industry' WHERE article_id = ${id("layer-industry-mid")}`;
+  await sql`UPDATE publications SET score = 10 WHERE article_id = ${id("layer-broken-low")}`;
+
+  const techPool = await loadPool({ channel: "all", category: null, tag: scopeTag, now });
+  assert.deepEqual(techPool.items.map(i => i.id), [id("layer-tech-high")]);
+
+  const peripheralPool = await loadPool({ channel: "all", category: "industry", tag: scopeTag, now });
+  assert.deepEqual(peripheralPool.items.map(i => i.id), [id("layer-promo-lite"), id("layer-industry-mid")]);
 });

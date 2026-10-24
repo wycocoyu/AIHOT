@@ -74,6 +74,20 @@ export default function AllPage() {
   const busy = navigation.state === "loading" && navigation.location?.pathname === "/all";
   const { channel, category } = filterParams(f);
   const keep = { channel, category };
+  const isPeripheral = !f.q && f.category === "industry";
+  const poolScopeHref = (scope: "tech" | "peripheral") => {
+    const sp = new URLSearchParams(params);
+    sp.delete("page");
+    sp.delete("cursor");
+    if (scope === "peripheral") {
+      sp.set("category", "industry");
+      sp.delete("channel");
+    } else {
+      sp.delete("category");
+    }
+    const s = sp.toString();
+    return s ? `/all?${s}` : "/all";
+  };
   const searchTabHref = (tab: "time" | "relevance") => {
     const sp = new URLSearchParams(params);
     sp.delete("page");
@@ -81,7 +95,7 @@ export default function AllPage() {
     else sp.delete("tab");
     return `/all?${sp}`;
   };
-  const title = f.q ? `搜索“${f.q}”` : f.tag ? `#${f.tag}` : null;
+  const title = f.q ? `搜索“${f.q}”` : f.tag ? `#${f.tag}` : isPeripheral ? "周边与快讯" : null;
   const updated = beijingTime(data.freshness);
   // Searches are remembered in this browser for the phone search (listed in the privacy notice).
   useEffect(() => {
@@ -108,13 +122,48 @@ export default function AllPage() {
       ) : (
         <FeedBar base="/all" category={f.category} channel={f.channel} />
       )}
+      {!f.q && (
+        <div className="mb-3 mt-1 flex items-center justify-between gap-2 lg:hidden">
+          <PillTabs
+            size="xs"
+            layoutId="all-pool-mob"
+            label="内容池切换"
+            active={isPeripheral ? "peripheral" : "tech"}
+            items={[
+              { key: "tech", label: "技术动态", to: poolScopeHref("tech"), prefetchOnPress: true },
+              { key: "peripheral", label: "周边与快讯", to: poolScopeHref("peripheral"), prefetchOnPress: true },
+            ]}
+          />
+          {isPeripheral && <span className="text-[12px] text-ink-4">套餐 · 活动 · 简讯</span>}
+        </div>
+      )}
       <ActiveFilters base="/all" category={f.category} channel={f.channel} tag={f.tag} />
 
-      {/* Desktop, as on 精选: the title, then one filter row with the search field aligned on the right. */}
+      {/* Desktop, as on 精选: the title + pool switch, then one filter row with the search field aligned on the right. */}
       <div className="hidden lg:block">
-        <h1 className="text-[24px] font-semibold leading-[1.3] text-ink">{title ?? ALL_TITLE}</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-[24px] font-semibold leading-[1.3] text-ink">{title ?? ALL_TITLE}</h1>
+          {!f.q && (
+            <PillTabs
+              size="sm"
+              layoutId="all-pool-desk"
+              label="内容池切换"
+              active={isPeripheral ? "peripheral" : "tech"}
+              items={[
+                { key: "tech", label: "技术动态", to: poolScopeHref("tech"), prefetchOnPress: true },
+                { key: "peripheral", label: "周边与快讯", to: poolScopeHref("peripheral"), prefetchOnPress: true },
+              ]}
+            />
+          )}
+        </div>
         <div className="mb-5 mt-4 flex items-center justify-between gap-4">
-          <CategoryTabs base="/all" category={f.category} channel={f.channel} layoutId="all-cat-desk" className="min-w-0" />
+          {isPeripheral ? (
+            <p className="text-[13.5px] text-ink-3">
+              收录价格套餐、额度折扣、训练营、技术大会预告、商业合作及低分简讯，不混入技术主时间线。
+            </p>
+          ) : (
+            <CategoryTabs base="/all" category={f.category} channel={f.channel} layoutId="all-cat-desk" className="min-w-0" />
+          )}
           <SearchField defaultValue={f.q ?? ""} keep={keep} />
         </div>
       </div>

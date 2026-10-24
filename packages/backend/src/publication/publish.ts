@@ -271,7 +271,13 @@ export async function publishArticleTx(tx: Tx, articleId: string, options: Publi
   // text is the title, where an article would still be a half-finished card.
   const zhTitle = analysis?.title_zh?.trim() ? analysis.title_zh : null;
   const original = originalPostCopy(article.x_post, article.url, article.x_article);
-  const title = pickString(f.title, original?.title ?? zhTitle ?? (isChineseTitle || article.x_post ? collapseWhitespace(article.title) : null));
+  const title = pickString(
+    f.title,
+    original?.title
+      ?? (isChineseTitle ? collapseWhitespace(article.title) : null)
+      ?? zhTitle
+      ?? (article.x_post ? collapseWhitespace(article.title) : null),
+  );
   const summary = pickString(f.summary, original ? original.summary : analysis?.summary_zh ?? null);
   const category = pickString(f.category, analysis?.category ?? null);
   const tags = Array.isArray(f.tags) ? (f.tags as string[]) : [...new Set([...(analysis?.tags ?? []), ...(analysis?.subjects ?? []).map((s) => `entity:${s}`)])];

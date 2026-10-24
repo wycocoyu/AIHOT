@@ -1,8 +1,10 @@
 // Article body extraction: readable text from the article page, or "unconfirmed" — never a wrong body.
 // Jina Reader is the budgeted fallback for pages that only render in a browser.
+import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
 import type { parseHTML } from "linkedom";
 import { sql } from "../db.ts";
+import { credential } from "../config.ts";
 import { guardedFetch, languageHeaders } from "../lib/http-fetch.ts";
 import { assertPageContent, contentDocument, UnavailablePageError } from "../lib/page-content.ts";
 import { stripTags } from "../lib/text.ts";
@@ -291,9 +293,93 @@ export function pagePublicationDate(document: Doc, utcOffset?: string): Publicat
   return day ?? { publishedAt: null, publicationTime: null };
 }
 
+/** Extract a WeChat Official Account article (#js_content or image-post) directly without Readability dropping hidden nodes. */
+export function extractWechatPage(html: string, url: string): ExtractedBody | null {
+  const ctMatch = /\bvar\s+ct\s*=\s*"(\d{10})"/.exec(html)
+    ?? /\bori_create_time\s*:\s*['"]?(\d{10})['"]?/.exec(html)
+    ?? /\bcreate_time\s*:\s*JsDecode\(['"](\d{10})['"]\)/.exec(html);
+  const publishedAt = ctMatch ? new Date(Number(ctMatch[1]) * 1000) : null;
+  const publicationTime = publishedAt && Number.isFinite(publishedAt.getTime()) ? publishedAt.toISOString() : null;
+
+  const $ = cheerio.load(html);
+  const jsContent = $("#js_content");
+  let rawHtml = "";
+  let isImagePost = false;
+
+  if (jsContent.length > 0) {
+    jsContent.find("script, style, mpprofile, mp-common-profile, mp-style-type, qqmusic, mpvoice").remove();
+    jsContent.find("pre").each((_, pre) => {
+      const codes = $(pre).children("code");
+      if (codes.length > 1) {
+        const lines = codes.toArray().map((c) => $(c).text());
+        $(pre).empty().append($("<code>").text(lines.join("\n")));
+      }
+    });
+    jsContent.find("img").each((_, img) => {
+      const el = $(img);
+      const dataSrc = (el.attr("data-src") || el.attr("data-original") || "").trim();
+      const src = (dataSrc || el.attr("src") || "").trim().replace(/^http:\/\/(mmbiz\.qpic\.cn|wx\.qlogo\.cn)\b/i, "https://$1");
+      if (!src || /^data:image\/(svg\+xml|gif)/i.test(src)) {
+        el.remove();
+        return;
+      }
+      el.attr("src", src);
+      el.removeAttr("data-src");
+      el.removeAttr("data-original");
+    });
+    rawHtml = jsContent.html() ?? "";
+  } else {
+    const desc = ($('meta[name="description"]').attr("content") || $('meta[property="og:description"]').attr("content") || "").trim();
+    const slideUrls: string[] = [];
+    const seen = new Set<string>();
+    for (const m of html.matchAll(/cdn_url\s*:\s*(?:JsDecode\()?['"](https?:\/\/mmbiz\.qpic\.cn\/[^'"]+)['"]/g)) {
+      const u = m[1]!.replace(/\\x26amp;/g, "&").replace(/&amp;/g, "&").replace(/^http:\/\//i, "https://");
+      if (!seen.has(u)) {
+        seen.add(u);
+        slideUrls.push(u);
+      }
+    }
+    if (desc || slideUrls.length > 0) {
+      isImagePost = true;
+      const paras = desc
+        .replace(/\\x0a/gi, "\n")
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => `<p>${cheerio.load("<div></div>")("div").text(line).html()}</p>`)
+        .join("");
+      const imgs = slideUrls.slice(0, 12).map((u) => `<figure><img src="${u}"></figure>`).join("");
+      rawHtml = `${paras}${imgs}`;
+    }
+  }
+
+  if (!rawHtml.trim()) return null;
+  const clean = trimTrailingChrome(sanitizeBody(rawHtml, url));
+  const text = stripTags(clean);
+  const images: ExtractedBody["images"] = [];
+  for (const m of clean.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)) {
+    const w = /\bwidth="(\d+)"/.exec(m[0]);
+    const h = /\bheight="(\d+)"/.exec(m[0]);
+    images.push({ kind: "image", url: m[1]!.replace(/&amp;/g, "&"), width: w ? Number(w[1]) : null, height: h ? Number(h[1]) : null });
+    if (images.length >= 12) break;
+  }
+  if (text.length < (isImagePost || images.length > 0 ? 10 : MIN_BODY_CHARS) && images.length === 0) return null;
+  return { html: clean, text: text || "（图文内容）", images, via: "readability", publishedAt, publicationTime };
+}
+
 /** The page's article, read under its source's rules (pageRules); null for an error page or no article. */
 export function readable(html: string, url: string, rules: PageRules = {}): ExtractedBody | null {
   if (isVideoPageUrl(url)) return null;
+  try {
+    if (/(^|\.)mp\.weixin\.qq\.com$/i.test(new URL(url).hostname)) {
+      if (/该内容已被发布者删除|此内容因违规无法查看|如你发现平台内存在内容侵犯了你的名誉/.test(html)) return null;
+      const wx = extractWechatPage(html, url);
+      if (wx) return wx;
+      return null;
+    }
+  } catch {
+    // fall through to standard Readability
+  }
   try { return readableDocument(contentDocument(html), url, rules); }
   catch (error) {
     if (error instanceof UnavailablePageError) return null;
@@ -431,7 +517,7 @@ export async function extractFromUrl(url: string, subject: string, rules: PageRu
   } catch {
     // fall through to Jina
   }
-  if (opts.paidFallback === false) return null;
+  if (opts.paidFallback === false || !credential("collectors", "JINA_API_KEY")) return null;
   try {
     const page = await jinaRead(url, { purpose: "body_fallback", subject });
     const html = markdownBody(page.markdown, url);
@@ -446,10 +532,10 @@ export async function extractFromUrl(url: string, subject: string, rules: PageRu
 
 /** Ordinary article pages; player pages have no article body, and social posts arrive separately. */
 export function pageFetchable(url: string, sourceKind: string): boolean {
-  if (sourceKind === "x_search" || sourceKind === "mp_account" || isVideoPageUrl(url)) return false;
+  if (sourceKind === "x_search" || isVideoPageUrl(url)) return false;
   try {
     const u = new URL(url);
-    return /^https?:$/.test(u.protocol) && !/(^|\.)(x\.com|twitter\.com|mp\.weixin\.qq\.com)$/i.test(u.hostname);
+    return /^https?:$/.test(u.protocol) && !/(^|\.)(x\.com|twitter\.com)$/i.test(u.hostname);
   } catch {
     return false;
   }

@@ -64,7 +64,7 @@ export function registerSite(app: FastifyInstance) {
   app.get("/api/site/timeline", siteHandler(async (req, reply) => {
     const q = looseQuery(req);
     const filters = parseFilters(q);
-    const limit = Math.min(Math.max(Number(q.limit) || 20, 1), 40);
+    const limit = Math.min(Math.max(Number(q.limit) || 60, 1), 100);
     const unfiltered = filters.channel === "all" && !filters.category && !filters.tag && !q.cursor;
     const [data, hot] = await Promise.all([
       loadTimeline({ ...filters, cursor: q.cursor || null, limit }),

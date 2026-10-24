@@ -156,6 +156,7 @@ docker compose up -d --build
 
 | 文档 | 内容 |
 |---|---|
+| **[cocoHot 项目路径、架构与运维手册](docs/TECHHOT_ARCHITECTURE_AND_OPS.md)** | **本站（`https://tech.resumegenkk.xyz`）本地与服务器路径、19 个大厂技术信源清单、微信拉取/正文解析/AI 导读/站内展示与配图反防盗链全链路说明** |
 | [把它改成你的行业](docs/customize.md) | 站名、分类、主题、信源、提示词、门槛、模型、品牌，一步一步来 |
 | [信源](docs/sources.md) | 六种信源怎么配，分级和全文，抓取频率，旧文和存档，固定起点 `publishedAfter`，外部推送接口 |
 | [精选与校准](docs/selection.md) | 一条资料怎么变成精选、怎么编进日报周报月报，怎么用自己的样本校准 |

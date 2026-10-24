@@ -6,9 +6,10 @@ import type { z } from "zod";
 import type { ModelPreset } from "@aihot/contracts/site-config";
 import { PRESETS } from "@aihot/site/models";
 import { config, credential } from "../config.ts";
+import { sql } from "../db.ts";
 import { sha256 } from "../lib/ids.ts";
 import {
-  assertAccepted, failureKind, logicalKeyFor, ModelOutputError, ModelUnavailableError, paidRequest, ProviderRejectedError, receiptState, rejectReceivedResponse,
+  assertAccepted, failedReceiptId, failureKind, logicalKeyFor, ModelOutputError, ModelUnavailableError, paidRequest, ProviderRejectedError, receiptState, rejectReceivedResponse,
   type ReceiptRequest,
 } from "./receipts.ts";
 import { enterModelCircuit, recordModelHealth, type CircuitPermit } from "./circuit.ts";
@@ -138,26 +139,47 @@ const TIMEOUT_MS = 120_000;
  */
 const FAILOVER_TIMEOUT_MS = 30_000;
 
+/** Number of attempts on the primary model (`default` / `auto`) before failing over to the backup model. */
+const PRIMARY_MAX_ATTEMPTS = 3;
+const PRIMARY_RETRY_DELAY_MS = 5_000;
+
 /**
- * With a backup (fallbackModel: editorial/models.ts picks one at another provider), a primary whose
- * outcome is unknown, or that the provider turns away for now, is continued by the backup at once:
- * besides the one release in operations/recover.ts, the other place where an unknown outcome is
- * followed by a second paid request.
+ * With a backup (fallbackModel: editorial/models.ts or automatic Doubao backup for `default`), a primary
+ * is retried up to PRIMARY_MAX_ATTEMPTS times on transient gateway/bridge outages or timeouts, and if it
+ * still fails, is continued by the backup at once.
  */
 export async function chatJson<S extends z.ZodType>(opts: ChatJsonOptions<S>): Promise<ChatJsonResult<z.infer<S>>> {
-  if (!opts.fallbackModel) return chatOnce(opts);
-  const backupOpts = { ...opts, model: opts.fallbackModel };
+  const autoDoubao = opts.model === "default" && MODELS["doubao-seed-2.1-lite"] && credential("models", "DOUBAO_API_KEY")
+    ? "doubao-seed-2.1-lite"
+    : undefined;
+  const fallbackModel = opts.fallbackModel ?? autoDoubao;
+  if (!fallbackModel) return chatOnce(opts);
+  const backupOpts = { ...opts, model: fallbackModel };
   const fallbackFor = logicalKeyFor(requestFor(opts, MODELS[opts.model]!).request);
-  const saved = await receiptState(requestFor(backupOpts, MODELS[opts.fallbackModel]!).request);
+  const saved = await receiptState(requestFor(backupOpts, MODELS[fallbackModel]!).request);
   // Finish an existing backup attempt before choosing a provider again, even after recovery/restart.
   if (saved && saved !== "failed") return chatOnce(backupOpts, true, fallbackFor);
-  try {
-    return await chatOnce(opts, true);
-  } catch (error) {
-    const kind = failureKind(error);
-    if (kind !== "unknown" && kind !== "outage") throw error;
-    return chatOnce(backupOpts, true, fallbackFor);
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= PRIMARY_MAX_ATTEMPTS; attempt++) {
+    try {
+      // Keep full TIMEOUT_MS for the `default` (`auto`) reasoning gateway rather than cutting off at 30s.
+      return await chatOnce({ ...opts, timeoutMs: opts.timeoutMs ?? TIMEOUT_MS }, true);
+    } catch (error) {
+      lastError = error;
+      const kind = failureKind(error);
+      if (kind !== "unknown" && kind !== "outage" && kind !== "unusable") break;
+      if (attempt < PRIMARY_MAX_ATTEMPTS) {
+        const unkId = kind === "unknown" ? failedReceiptId(error) : null;
+        if (unkId !== null) {
+          await sql`UPDATE receipts SET status = 'failed' WHERE id = ${unkId} AND status = 'unknown'`;
+        }
+        await new Promise((r) => setTimeout(r, PRIMARY_RETRY_DELAY_MS));
+      }
+    }
   }
+  const kind = failureKind(lastError);
+  if (kind !== "unknown" && kind !== "outage" && kind !== "unusable" && kind !== "refused") throw lastError;
+  return chatOnce(backupOpts, true, fallbackFor);
 }
 
 async function chatOnce<S extends z.ZodType>(opts: ChatJsonOptions<S>, circuit = false, fallbackFor?: string): Promise<ChatJsonResult<z.infer<S>>> {

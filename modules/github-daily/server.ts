@@ -49,14 +49,23 @@ function today(): string {
 }
 
 export async function fetchTrending(): Promise<GithubDailyItem[]> {
-  const response = await fetch(TRENDING_URL, {
-    headers: { "user-agent": "cocoHotBot/1.0", accept: "text/html" },
-    signal: AbortSignal.timeout(25_000),
-  });
-  if (!response.ok) throw new Error(`GitHub Trending returned ${response.status}`);
-  const items = parseTrendingHtml(await response.text());
-  if (!items.length) throw new Error("GitHub Trending returned no repositories");
-  return items;
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const response = await fetch(TRENDING_URL, {
+        headers: { "user-agent": "cocoHotBot/1.0", accept: "text/html" },
+        signal: AbortSignal.timeout(25_000),
+      });
+      if (!response.ok) throw new Error(`GitHub Trending returned ${response.status}`);
+      const items = parseTrendingHtml(await response.text());
+      if (!items.length) throw new Error("GitHub Trending returned no repositories");
+      return items;
+    } catch (err) {
+      lastError = err;
+      if (attempt < 2) await new Promise((r) => setTimeout(r, 1500));
+    }
+  }
+  throw lastError;
 }
 
 export async function refreshGithubDaily(snapshotDate = today()): Promise<GithubDailyItem[]> {
@@ -110,11 +119,34 @@ async function readSnapshot(snapshotDate: string): Promise<GithubDailyItem[]> {
   return rows.map((row) => ({ rank: row.rank, repository: row.repository, url: row.url, description: row.description, language: row.language, starsTotal: row.stars_total, starsToday: row.stars_today, aiSummary: row.ai_summary }));
 }
 
+async function readLatestSnapshot(): Promise<{ date: string; items: GithubDailyItem[] } | null> {
+  const [latest] = await sql<{ snapshot_date: string }[]>`
+    SELECT snapshot_date::text FROM github_daily_snapshots ORDER BY snapshot_date DESC LIMIT 1`;
+  if (!latest) return null;
+  const items = await readSnapshot(latest.snapshot_date);
+  return items.length ? { date: latest.snapshot_date, items } : null;
+}
+
+let refreshInFlight: Promise<GithubDailyItem[]> | null = null;
+
 function registerHttp(app: FastifyInstance) {
   app.get("/api/github-daily", async (_request, reply) => {
     const snapshotDate = today();
     let items = await readSnapshot(snapshotDate);
-    if (!items.length) items = await refreshGithubDaily(snapshotDate);
+    if (!items.length) {
+      try {
+        refreshInFlight ??= refreshGithubDaily(snapshotDate).finally(() => {
+          refreshInFlight = null;
+        });
+        items = await refreshInFlight;
+      } catch (err) {
+        const fallback = await readLatestSnapshot();
+        if (fallback) {
+          return reply.header("Cache-Control", "public, s-maxage=60").send({ date: fallback.date, sourceUrl: TRENDING_URL, items: fallback.items });
+        }
+        throw err;
+      }
+    }
     return reply.header("Cache-Control", "public, s-maxage=300").send({ date: snapshotDate, sourceUrl: TRENDING_URL, items });
   });
 }

@@ -111,11 +111,29 @@ export function publicMatchCondition(terms: string[]) {
   );
 }
 
+const PERIPHERAL_TITLE_PATTERN = "Gemini Model Garden|八折|Lite ?套餐|续费权益|限时加量|提效营|上新[、，]?更新公告|QCon|ChatGPT Ads|Orchestra Bio|公共利益基金|MediaKit";
+
+/**
+ * Pool scope filter:
+ * - When category === 'industry' ("周边与快讯" pool): shows peripheral items (category = 'industry' OR 20 <= score < 50 OR peripheral promo/pricing notices).
+ * - When browsing technical pool (!hasSearch and category !== 'industry'): shows pure technical items (category <> 'industry' AND score >= 50).
+ * - When searching (hasSearch): searches across all listed items matching the explicit filter.
+ */
+function poolFilterCondition(f: TimelineFilters, hasSearch = false) {
+  if (f.category === "industry") {
+    return sql`${channelCondition(f.channel)} ${tagCondition(f.tag)} AND (p.category = 'industry' OR (p.score IS NOT NULL AND p.score < 50) OR p.title ~* ${PERIPHERAL_TITLE_PATTERN}) AND (p.score IS NULL OR p.score >= 20)`;
+  }
+  if (!hasSearch) {
+    return sql`${channelCondition(f.channel)} ${categoryCondition(f.category)} ${tagCondition(f.tag)} AND COALESCE(p.category, '') <> 'industry' AND (p.score IS NULL OR p.score >= 50) AND p.title !~* ${PERIPHERAL_TITLE_PATTERN}`;
+  }
+  return sql`${channelCondition(f.channel)} ${categoryCondition(f.category)} ${tagCondition(f.tag)}`;
+}
+
 /** The listed items under the filters, up to the pages the pool offers. */
 async function listedCount(f: TimelineFilters, now: Date): Promise<number> {
   return Number(one(await sql<{ n: number }[]>`
     SELECT count(*) AS n FROM (SELECT 1 FROM publications p WHERE ${listedCondition(now)}
-      ${channelCondition(f.channel)} ${categoryCondition(f.category)} ${tagCondition(f.tag)} LIMIT ${POOL_MAX_PAGES * POOL_PAGE_SIZE}) t`).n);
+      ${poolFilterCondition(f, false)} LIMIT ${POOL_MAX_PAGES * POOL_PAGE_SIZE}) t`).n);
 }
 
 /** Without a search the total only sets the page count: it is reused for 30 seconds per filter. */
@@ -144,7 +162,7 @@ async function queryPool(query: PoolQuery, now: Date): Promise<PoolResponse> {
   const tab = q && query.tab === "relevance" ? "relevance" : "time";
   const terms = q ? searchTerms(q) : [];
   const entityTag = q ? queryEntityTag(q) : null;
-  const filters = sql`${channelCondition(query.channel)} ${categoryCondition(query.category)} ${tagCondition(query.tag)}`;
+  const filters = poolFilterCondition(query, !!q);
   const offset = (page - 1) * POOL_PAGE_SIZE;
   const cap = POOL_MAX_PAGES * POOL_PAGE_SIZE;
 

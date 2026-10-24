@@ -24,21 +24,22 @@ function hrefWith(base: string, params: URLSearchParams, patch: Record<string, s
   return s ? `${base}?${s}` : base;
 }
 
+const TECH_CATEGORY_KEYS = CATEGORY_KEYS.filter((k) => k !== "industry");
+
 /**
- * The feed's one filter (精选 and 全部动态 alike): none, 一手, or a category. One choice at a time: picking
- * 一手 clears the category and picking a category clears 一手. Older 资讯 / X links still filter; the
- * choice then shows as none.
+ * The feed's one filter (精选 and 全部技术动态 alike): none, 一手, or one of the 5 technical categories.
+ * "周边与快讯" (industry) is separated into its own secondary pool switch on /all so "全部" strictly means all 5 technical categories.
  */
 function filterOptions(base: string, params: URLSearchParams, noneLabel: string) {
   return [
     { key: "all", label: noneLabel, to: hrefWith(base, params, { category: null, channel: null }) },
     { key: "firstParty", label: CHANNEL_LABELS.firstParty, to: hrefWith(base, params, { category: null, channel: "firstParty" }) },
-    ...CATEGORY_KEYS.map((k) => ({ key: k, label: CATEGORY_LABELS[k], to: hrefWith(base, params, { category: k, channel: null }) })),
+    ...TECH_CATEGORY_KEYS.map((k) => ({ key: k, label: CATEGORY_LABELS[k], to: hrefWith(base, params, { category: k, channel: null }) })),
   ];
 }
 
 function filterKey(category: CategoryKey | null, channel: ChannelKey): string {
-  return channel === "firstParty" ? "firstParty" : (category ?? "all");
+  return channel === "firstParty" ? "firstParty" : category && category !== "industry" ? category : "all";
 }
 
 /** Desktop: the filter as a row of tabs beside the search field. */
@@ -54,7 +55,10 @@ export function CategoryTabs({ base, category, channel = "all", layoutId, classN
 export function FeedBar({ base, category, channel }: { base: "/" | "/all"; category: CategoryKey | null; channel: ChannelKey }) {
   const [params] = useSearchParams();
   const [sheet, setSheet] = useState(false);
-  const scope = (to: string) => hrefWith(to, params, { q: null, tab: null, search: null });
+  const scope = (to: string) => hrefWith(to, params, {
+    q: null, tab: null, search: null,
+    ...(category === "industry" ? { category: null } : {}),
+  });
   const filtered = filterKey(category, channel) !== "all";
   return (
     <>
@@ -121,7 +125,7 @@ function FilterSheet({ open, onClose, base, active }: { open: boolean; onClose: 
 /** Phones: the filter and tag in use as chips under the bar; each one clears itself when tapped. */
 export function ActiveFilters({ base, category, channel, tag }: { base: string; category: CategoryKey | null; channel: ChannelKey; tag: string | null }) {
   const [params] = useSearchParams();
-  const label = channel === "firstParty" ? CHANNEL_LABELS.firstParty : category ? CATEGORY_LABELS[category] : null;
+  const label = channel === "firstParty" ? CHANNEL_LABELS.firstParty : category && category !== "industry" ? CATEGORY_LABELS[category] : null;
   if (!label && !tag) return null;
   const chip = "inline-flex min-h-11 max-w-full items-center gap-1 rounded-full bg-accent-soft pl-3 pr-2 text-[13px] font-medium text-accent transition-opacity active:opacity-60";
   return (

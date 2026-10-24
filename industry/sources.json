@@ -1,370 +1,574 @@
 {
-  "$comment": "示范信源：首次启动时导入（scripts/seed.ts），已存在的不会被覆盖。之后在后台“信源”里新建、修改和暂停。字段说明见 docs/customize.md。",
   "sources": [
+    {
+      "id": "mp-tencent-tech",
+      "name": "腾讯技术工程",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "tencent",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/j3gficicyOvauPPfL7J2AVERiaoMJy9NBIwbJE2ZRJX7FZ2Dx7IibtTwdlqYSqTZTCsXkDS2jvNF8wWJKcibxXtOHng/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "AI"
+      ],
+      "config": {
+        "wxid": "MjM5ODYwMjI2MA==",
+        "nickname": "腾讯技术工程",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-alibaba-tech",
+      "name": "阿里技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "alibaba",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/kN3t5R6pdz4aZoKNcAoqDqD4xLQ47s1776ibHFO8odPhH5mAKaVQAsL6WaoZqbwziaIobzJGwlcF4FjrtFDEntOTibXrDjRq1kGYr8SqNSBD0o/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "AI"
+      ],
+      "config": {
+        "wxid": "Mzg4NTczNzg2OA==",
+        "nickname": "阿里技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-taobao-tech",
+      "name": "大淘宝技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "alibaba",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/33P2FdAnju8t5nZGhAatCrc4e2iaDfAaoInribRKxc7MOqdTGygfcLqSDxhj0trCHVEh94Sjl7zuWYzwouYtJ0VQ/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "前端与客户端",
+        "后端架构"
+      ],
+      "config": {
+        "wxid": "MzAxNDEwNjk5OQ==",
+        "nickname": "大淘宝技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-amap-tech",
+      "name": "高德技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "amap",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/sOrYHgiaZT2Uuw8t5WHLrMLsEz9JVv3jCL128hmlETHE34GSPxLr48W93kgFTiap0rXqA7UNTDSWwG1WWEo3ne3g/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "AI",
+        "后端架构"
+      ],
+      "config": {
+        "wxid": "MzE5ODQ3MDM4Mw==",
+        "nickname": "高德技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-qwen-ai",
+      "name": "千问AI平台",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "qwen",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/j7RlD5l5q1xjdLh9QRmxeic5Wdtf6ia3GOeIicQHa7ZibLgBpft6LHpTmOicOtc6v6msdWBGuKHwypE5icOYLvbmCzXAGmgiaIVicv7kWl1QTAzqkyQ/0?wx_fmt=png",
+      "tags": [
+        "大模型",
+        "Agent",
+        "工程实践"
+      ],
+      "config": {
+        "wxid": "MzIzOTU0NTQ0MA==",
+        "nickname": "千问AI平台",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-qoder",
+      "name": "Qoder",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "qoder",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/GicicSW0VicbibkWU2TnjgoPkaAfF0VFX8TnRggbnmXcUH4u5XB1ibMcfasLHKNzrIaicQMbqibf8yLQvqd74epZicpHCh2iczSWEib0F6m4LxECcn9Ko/0?wx_fmt=png",
+      "tags": [
+        "编程",
+        "Agent",
+        "工具与平台"
+      ],
+      "config": {
+        "wxid": "MzE5ODI2NzI5Nw==",
+        "nickname": "Qoder",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-xiaomi-tech",
+      "name": "小米技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "xiaomi",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/Re4KW51oYRq4UrCjgOIEs9v3IP1QHwibB2DmKH23DkUs9Vq3nYjNd1TKdwbTAmqdz6SuqepsCUMOPkFk0dRuVfw/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "AI",
+        "前端与客户端"
+      ],
+      "config": {
+        "wxid": "MzUxMDQxMDMyNg==",
+        "nickname": "小米技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-dewu-tech",
+      "name": "得物技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "dewu",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/AAQtmjCc74AlsHDtoVyU8hqzNTGS26fV9PmHAcZ8uib1GWNJibIuBiavPdAXw9IOzjlEAYRJUNjOEme5geMNPoZ1Q/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "研发效能"
+      ],
+      "config": {
+        "wxid": "MzkxNTE3ODU0NA==",
+        "nickname": "得物技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-kuaishou-tech",
+      "name": "快手技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "kuaishou",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/ZxDY5TMPs0GnTFDtpq8oAf91ZQDzvLt6LCp56JQCbFT2cT8uZquFdeJOKbmM4fucIPqtAPvMT0X4DpfpuZibic3Q/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "AI",
+        "后端架构"
+      ],
+      "config": {
+        "wxid": "Mzg2NzU4MDM0MQ==",
+        "nickname": "快手技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-jd-tech",
+      "name": "京东技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "jd",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/RQv8vncPm1X5Gac5XcPPmhSR2Fsq1YX7asRaOEcBOmnGFyOHNmJPRXCVx6rtfT4RiboAkQZT0IIUZdIpv8rxvBg/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "AI"
+      ],
+      "config": {
+        "wxid": "MzU1MzE2NzIzMg==",
+        "nickname": "京东技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-jdcloud-dev",
+      "name": "京东云开发者",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "jd",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/9K73WSRq6BWyKqhKFzMgibicMuLCqmmqWpOmQ2tovCBswRKVxdO6zaiarVIPc83MibTauxLibnACJWk48ibUyAXBF7dw/0?wx_fmt=png",
+      "tags": [
+        "云原生",
+        "工程实践",
+        "AI"
+      ],
+      "config": {
+        "wxid": "MzU1OTgxMTg2Nw==",
+        "nickname": "京东云开发者",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-bytedance-tech",
+      "name": "字节跳动技术团队",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "bytedance",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/5EcwYhllQOhkoWTP1gVm0Lqs480XOARyoSYjPEsRVCSF35cbWIp6cliaYic8KUfNfiaSjVnruzTQUTCA0lmv9vUmw/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "云原生"
+      ],
+      "config": {
+        "wxid": "MzI1MzYzMjE0MQ==",
+        "nickname": "字节跳动技术团队",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-volcengine-agent",
+      "name": "火山引擎Agent社区",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "bytedance",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/YrzTc98J7vB70MqjCriaPib8Coh9vHNJT3nBLhP1kkFMIbpKvWLh2licdtyKdaicQyJFQHsOlFw9CCmjRSnhVBUy3gwWlkB65Wh2zqw43MR7RfU/0?wx_fmt=png",
+      "tags": [
+        "Agent",
+        "大模型",
+        "工具与平台"
+      ],
+      "config": {
+        "wxid": "MzkwNTIwNzc3OQ==",
+        "nickname": "火山引擎Agent社区",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-meituan-tech",
+      "name": "美团技术团队",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "meituan",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/hEx03cFgUsVGibnsaEib3aNlqF0tOrA2RGEmNSbia2nnohE4Tpf95UyTiaSjDVbHRfY8WNBeTuLLTaVdSckkNyEx1Q/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "AI"
+      ],
+      "config": {
+        "wxid": "MjM5NjQ5MTI5OA==",
+        "nickname": "美团技术团队",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-vivo-tech",
+      "name": "vivo互联网技术",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "vivo",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/4g5IMGibSxt45QXJZicZ9gaNU2mRSlvqhQd94MJ7oQh4QFj1ibPV66xnUiaKoicSatwaGXepL5sBDSDLEckicX1ttibHg/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "前端与客户端"
+      ],
+      "config": {
+        "wxid": "MzI4NjY4MTU5Nw==",
+        "nickname": "vivo互联网技术",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-youzan-coder",
+      "name": "有赞coder",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "youzan",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/PfMGv3PxR79frLDiaovDibVb6xynV9gxJYgv9m1716uJUqzYWhg0NV3iaVJpn3EbPrAVcpgagX6qAQUMmHQwr04fQ/0?wx_fmt=png",
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "研发效能"
+      ],
+      "config": {
+        "wxid": "MzAxOTY5MDMxNA==",
+        "nickname": "有赞coder",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-tencent-workbuddy",
+      "name": "腾讯WorkBuddy",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "tencent",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/sz_mmbiz_png/u0lmmJTuFHjEVr3Ab1RlgvdeXxpTOZV7MCQ4XAqsNggic33xvjYKmpRajFS0Eafl5MxAZpzytAMia6ECbnDDeENqCOWSP2hNiactEhECicFvNyg/0?wx_fmt=png",
+      "tags": [
+        "Agent",
+        "编程",
+        "工具与平台"
+      ],
+      "config": {
+        "wxid": "MzYzODgxODMzNQ==",
+        "nickname": "腾讯WorkBuddy",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "mp-aliyun-cloudnative",
+      "name": "阿里云云原生",
+      "kind": "mp_account",
+      "tier": "T1",
+      "owner_entity_id": "alibaba",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "icon_url": "https://mmbiz.qpic.cn/mmbiz_png/yvBJb5IiafvmLicJBEO2fiafFTtc71G0CKibefQ9dLbMwjFgrUABIjUb3gsQB07nZSNaiaRRuacLnLZvE0GXVojic3fA/0?wx_fmt=png",
+      "tags": [
+        "云原生",
+        "后端架构",
+        "可观测性"
+      ],
+      "config": {
+        "wxid": "MzUzNzYxNjAzMg==",
+        "nickname": "阿里云云原生",
+        "publisherRole": "organization"
+      }
+    },
+    {
+      "id": "rss-meituan-tech",
+      "name": "美团技术团队博客",
+      "kind": "rss",
+      "tier": "T1",
+      "owner_entity_id": "meituan",
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "工程实践",
+        "后端架构",
+        "AI"
+      ],
+      "config": {
+        "feedUrl": "https://tech.meituan.com/rss.xml",
+        "summaryIsBody": true,
+        "publisherRole": "organization",
+        "publisherUrlPrefixes": [
+          "https://tech.meituan.com/"
+        ]
+      }
+    },
+    {
+      "id": "rss-claude-dev",
+      "name": "Claude Developer Blog",
+      "kind": "rss",
+      "tier": "T1",
+      "owner_entity_id": "anthropic",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "官方",
+        "工程实践",
+        "Agent"
+      ],
+      "config": {
+        "feedUrl": "https://claude.dev/rss.xml",
+        "fetchPublicContent": true,
+        "_aihot": {
+          "initialBackfillLimit": 4
+        }
+      }
+    },
+    {
+      "id": "web-anthropic-engineering",
+      "name": "Anthropic Engineering",
+      "kind": "web_list",
+      "tier": "T1",
+      "owner_entity_id": "anthropic",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "官方",
+        "工程实践",
+        "Agent"
+      ],
+      "config": {
+        "url": "https://www.anthropic.com/engineering",
+        "parseMode": "html",
+        "itemSelector": "article[data-listing-row]",
+        "linkSelector": "h3 a",
+        "titleSelector": "h3 a",
+        "publishedAtSelector": "time",
+        "fetchPublicContent": true,
+        "_aihot": {
+          "initialBackfillLimit": 4
+        }
+      }
+    },
+    {
+      "id": "web-claude-blog",
+      "name": "Claude Blog",
+      "kind": "web_list",
+      "tier": "T1",
+      "owner_entity_id": "anthropic",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "官方",
+        "工程实践",
+        "产品"
+      ],
+      "config": {
+        "url": "https://claude.com/resources/articles",
+        "parseMode": "html",
+        "itemSelector": "a[class*=\"ResourceCard\"]",
+        "linkSelector": "a[class*=\"ResourceCard\"]",
+        "titleSelector": "h3",
+        "publishedAtSelector": "span[class*=\"meta\"]",
+        "fetchPublicContent": true,
+        "_aihot": {
+          "initialBackfillLimit": 4
+        }
+      }
+    },
+    {
+      "id": "web-anthropic-news",
+      "name": "Anthropic News",
+      "kind": "web_list",
+      "tier": "T1",
+      "owner_entity_id": "anthropic",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "官方",
+        "模型发布"
+      ],
+      "config": {
+        "url": "https://www.anthropic.com/news",
+        "parseMode": "html",
+        "itemSelector": "article[class]",
+        "linkSelector": "h3 a, a[class*=\"tileLink\"]",
+        "titleSelector": "h2, h3",
+        "publishedAtSelector": "time",
+        "fetchPublicContent": true,
+        "_aihot": {
+          "initialBackfillLimit": 4
+        }
+      }
+    },
     {
       "id": "rss-openai-news",
       "name": "OpenAI News",
       "kind": "rss",
+      "tier": "T1",
+      "owner_entity_id": "openai",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
+      "tags": [
+        "官方",
+        "模型发布"
+      ],
       "config": {
         "feedUrl": "https://openai.com/news/rss.xml",
+        "fetchPublicContent": true,
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 4
         }
-      },
+      }
+    },
+    {
+      "id": "rss-openai-devs",
+      "name": "OpenAI Developers",
+      "kind": "rss",
       "tier": "T1",
       "owner_entity_id": "openai",
       "participation_mode": "editorial",
       "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-google-deepmind",
-      "name": "Google DeepMind",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://deepmind.google/blog/rss.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": "google",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-google-research",
-      "name": "Google Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://research.google/blog/rss/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": "google",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "site_fulltext": true,
+      "syndicate_fulltext": true,
       "tags": [
         "官方",
-        "研究"
+        "工程实践"
       ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-hugging-face",
-      "name": "Hugging Face Blog",
-      "kind": "rss",
       "config": {
-        "feedUrl": "https://huggingface.co/blog/feed.xml",
+        "feedUrl": "https://developers.openai.com/rss.xml",
+        "fetchPublicContent": true,
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 4
         }
-      },
-      "tier": "T1",
-      "owner_entity_id": "hugging-face",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "开源"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-microsoft-research",
-      "name": "Microsoft Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.microsoft.com/en-us/research/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": "microsoft",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "研究"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-nvidia-blog",
-      "name": "NVIDIA Blog",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://blogs.nvidia.com/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": "nvidia",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-aws-ml",
-      "name": "AWS Machine Learning Blog",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://aws.amazon.com/blogs/machine-learning/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "教程"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-github-ai",
-      "name": "GitHub Blog · AI & ML",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://github.blog/ai-and-ml/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-mistral",
-      "name": "Mistral AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://mistral.ai/news/rss",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-bair",
-      "name": "Berkeley AI Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://bair.berkeley.edu/blog/feed.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 180,
-      "tags": [
-        "研究"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-the-verge-ai",
-      "name": "The Verge · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-techcrunch-ai",
-      "name": "TechCrunch · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://techcrunch.com/category/artificial-intelligence/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-ars-technica-ai",
-      "name": "Ars Technica · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://arstechnica.com/ai/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-mit-tech-review-ai",
-      "name": "MIT Technology Review · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-the-decoder",
-      "name": "The Decoder",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://the-decoder.com/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-simon-willison",
-      "name": "Simon Willison",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://simonwillison.net/atom/everything/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "个人"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-import-ai",
-      "name": "Import AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://importai.substack.com/feed",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 180,
-      "tags": [
-        "个人",
-        "周刊"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-latent-space",
-      "name": "Latent Space",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.latent.space/feed",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 180,
-      "tags": [
-        "个人"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
+      }
     }
   ]
 }

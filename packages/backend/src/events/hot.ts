@@ -182,7 +182,9 @@ export function heatIndex(heat: number): number {
 
 export async function computeHotRanking(at = new Date()): Promise<{ id: number; entries: number }> {
   const behind = behindSources(await sourceClocks(), at.getTime(), true);
-  const rows = (await heatRows(at, behind)).filter((r) => Number(r.participants) >= MIN_PARTICIPANTS && Number(r.editorial_participants) >= 1);
+  const allRows = (await heatRows(at, behind)).filter((r) => Number(r.editorial_participants) >= 1);
+  const multi = allRows.filter((r) => Number(r.participants) >= MIN_PARTICIPANTS);
+  const rows = multi.length > 0 ? multi : allRows;
   rows.sort((a, b) => Number(b.heat) - Number(a.heat) || (b.latest_at?.getTime() ?? 0) - (a.latest_at?.getTime() ?? 0));
 
   const entries: HotEntry[] = [];

@@ -277,6 +277,7 @@ async function runScores(
   const values: number[] = [];
   const receiptIds: number[] = [];
   let reused = true;
+  let usedModel = model;
   // One after the other: the second call reuses the provider's cached prompt.
   for (let i = 0; i < SCORE_CALLS; i++) {
     checkAnalysisRunning();
@@ -288,6 +289,7 @@ async function runScores(
         attemptTag: tagged(opts.attemptTag, `score-${i + 1}`),
       });
       onReceipt?.(res.receiptId);
+      usedModel = res.model;
       values.push(res.data.attentionScore);
       receiptIds.push(res.receiptId);
       reused &&= res.reused;
@@ -295,11 +297,11 @@ async function runScores(
       const receiptId = failedReceiptId(error);
       if (receiptId !== null) onReceipt?.(receiptId);
       // The model's content filter declines the material (Zhipu 1301): not scored, so not selected.
-      if (isContentFilter(error)) return { model, threshold, values, receiptIds, reused: false, refused: true };
+      if (isContentFilter(error)) return { model: usedModel, threshold, values, receiptIds, reused: false, refused: true };
       throw error;
     }
   }
-  return { model, threshold, values, receiptIds, reused };
+  return { model: usedModel, threshold, values, receiptIds, reused };
 }
 
 /** The production score step; its threshold stays case-specific even when an evaluator shares model output. */
@@ -510,7 +512,8 @@ export function normalizeAnalysis(run: AnalysisRun) {
   const values = run.scores && !run.scores.refused ? run.scores.values : null;
   const score = shownScore(run.scores);
   const threshold = run.scores?.threshold ?? null;
-  const selected = relevance === "pass" && scoresSelect(run.scores);
+  const category = run.structure?.category ?? null;
+  const selected = relevance === "pass" && scoresSelect(run.scores) && category !== "industry";
   const subjects = run.structure?.subjects ?? [];
   const tags = [...(run.structure?.tags ?? [])];
   for (const s of subjects) {
@@ -525,7 +528,7 @@ export function normalizeAnalysis(run: AnalysisRun) {
     scoreModel: run.scores?.model ?? null,
     scoreRefused: run.scores?.refused ?? false,
     threshold,
-    category: run.structure?.category ?? null,
+    category,
     tags,
     subjects,
     titleZh,
